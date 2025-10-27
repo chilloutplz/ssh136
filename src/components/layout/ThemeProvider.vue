@@ -1,3 +1,4 @@
+<!-- /src/components/common/ThemeToggler.vue -->
 <template>
   <slot></slot>
 </template>
@@ -44,8 +45,13 @@ provide('theme', {
 <script lang="ts">
 import { inject } from 'vue'
 
+type ThemeContext = {
+  isDarkMode: boolean
+  toggleTheme: () => void
+}
+
 export function useTheme() {
-  const theme = inject('theme')
+  const theme = inject<ThemeContext>('theme')
   if (!theme) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }

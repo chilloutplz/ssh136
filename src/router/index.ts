@@ -6,12 +6,13 @@ const router = createRouter({
     return savedPosition || { left: 0, top: 0 }
   },
   routes: [
+    // Menu
     {
       path: '/',
       name: 'Ecommerce',
       component: () => import('../views/Ecommerce.vue'),
       meta: {
-        title: 'eCommerce Dashboard',
+        title: 'Dashboard',
       },
     },
     {
@@ -22,6 +23,33 @@ const router = createRouter({
         title: 'Calendar',
       },
     },
+    {
+      path: '/purchase',
+      name: 'Purchase',
+      component: () => import('../views/Purchases/Purchase.vue'),
+      meta: {
+        title: 'PurchaseList',
+      },
+    },
+    { path: '/purchases/new',
+      name: 'PurchaseForm',
+      component: () => import('../views/Purchases/PurchaseForm.vue'),
+      meta: {
+        title: 'PurchaseForm',
+      },
+    },
+
+
+    // Others
+    {
+      path: '/icon-gallery',
+      name: 'IconGallery',
+      component: () => import('../views/Pages/IconGallery.vue'),
+      meta: {
+        title: 'IconGallery',
+      },
+    },
+    /*
     {
       path: '/profile',
       name: 'Profile',
@@ -80,7 +108,6 @@ const router = createRouter({
         title: 'Badge',
       },
     },
-
     {
       path: '/buttons',
       name: 'Buttons',
@@ -89,7 +116,6 @@ const router = createRouter({
         title: 'Buttons',
       },
     },
-
     {
       path: '/images',
       name: 'Images',
@@ -114,7 +140,6 @@ const router = createRouter({
         title: 'Blank',
       },
     },
-
     {
       path: '/error-404',
       name: '404 Error',
@@ -123,7 +148,6 @@ const router = createRouter({
         title: '404 Error',
       },
     },
-
     {
       path: '/signin',
       name: 'Signin',
@@ -140,12 +164,13 @@ const router = createRouter({
         title: 'Signup',
       },
     },
+    */
   ],
 })
 
 export default router
 
 router.beforeEach((to, from, next) => {
-  document.title = `Vue.js ${to.meta.title} | TailAdmin - Vue.js Tailwind CSS Dashboard Template`
+  document.title = `SSH136 | ${to.meta.title}`
   next()
 })

@@ -1,3 +1,4 @@
+<!-- /src/components/ui/Button.vue -->
 <template>
   <button
     :class="[
@@ -21,10 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// import { computed } from 'vue'
 
 interface ButtonProps {
-  size?: 'sm' | 'md'
+  size?: 'xm' | 'sm' | 'md'
   variant?: 'primary' | 'outline'
   startIcon?: object
   endIcon?: object
@@ -41,6 +42,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
 })
 
 const sizeClasses = {
+  xm: 'px-3 py-2 text-sm',
   sm: 'px-4 py-3 text-sm',
   md: 'px-5 py-3.5 text-sm',
 }
