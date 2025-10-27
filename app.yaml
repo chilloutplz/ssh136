@@ -1,0 +1,13 @@
+name: ssh136
+app: node@24
+options:
+  git:
+    branch: main
+    url: https://github.com/chilloutplz/ssh136.git
+  env:
+    - name: NODE_ENV
+      value: production
+  install: npm install
+  build: npm run build
+  start: npm run preview
+ports: 4173
