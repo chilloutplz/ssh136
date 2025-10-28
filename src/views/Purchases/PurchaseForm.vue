@@ -10,8 +10,7 @@
           <!-- 거래처 선택 -->
           <ComponentCard title="거래처">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormInput ref="supplierInput" label="거래처명" v-model="form.supplier" placeholder="거래처명" label-by="name"
-                value-by="id" />
+              <AutoCompleteSupplier v-model="selectedSupplier" />
 
               <FormInput label="사업자번호" v-model="form.bussinessNumber" placeholder="사업자번호" readonly />
             </div>
@@ -54,15 +53,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import ComponentCard from '@/components/common/ComponentCard.vue'
 import Button from '@/components/ui/Button.vue'
 import FormInput from '@/components/forms/FormInput.vue'
 import TextArea from '@/components/forms/TextArea.vue'
+import AutoCompleteSupplier from '@/components/forms/AutoCompleteSupplier.vue'
 
 const currentPageTitle = ref('거래명세서 등록')
+
+interface Supplier {
+  id: number
+  name: string
+  business_number: string
+}
 
 const form = ref({
   supplier: '',
@@ -73,16 +79,13 @@ const form = ref({
   attachment: null as File | null,
 })
 
-// const fetchSuppliers = async () => {
-//   try {
-//     const response = await axios.get('http://127.0.0.1:8000/purchases/suppliers/')
-//     supplierOptions.value = response.data
-//   } catch (error) {
-//     console.error('거래처 목록을 불러오지 못했습니다:', error)
-//   } finally {
-//     isLoading.value = false
-//   }
-// }
+const selectedSupplier = ref<Supplier | null>(null)
+
+watch(selectedSupplier, (supplier) => {
+  form.value.supplier = supplier?.name || ''
+  form.value.bussinessNumber = supplier?.business_number || ''
+})
+
 
 const supplierInput = ref<HTMLElement | null>(null)
 
@@ -90,18 +93,6 @@ onMounted(() => {
   supplierInput.value?.focus()
 })
 
-
-// interface Supplier {
-//   id: number
-//   name: string
-//   business_number: string
-// }
-
-// const onSupplierSelected = (selected: Supplier | null) => {
-//   if (selected && typeof selected === 'object') {
-//     form.value.bussinessNumber = selected.business_number
-//   }
-// }
 
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement
