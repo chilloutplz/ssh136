@@ -4,6 +4,33 @@ layer(base);
 
 @import 'tailwindcss';
 
+/* 공용 커스텀 클래스 */
+.input-style {
+  @apply mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600
+         bg-gray-50 dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white
+         focus:border-blue-500 focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors;
+}
+
+.btn-secondary {
+  @apply border border-gray-300 dark:border-gray-600 px-4 py-2 rounded
+         text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -36,6 +63,17 @@ layer(base);
   --text-theme-sm--line-height: 20px;
   --text-theme-xs: 12px;
   --text-theme-xs--line-height: 18px;
+
+  --color-primary: #3C50E0;
+  --color-primary-dark: #3347C4;
+  --color-secondary: #313D4F;
+  --color-secondary-dark: #3d4a5e;
+  --color-danger: #DC2626;
+  --color-danger-dark: #B91C1C;
+  --color-warning: #F59E0B;
+  --color-warning-dark: #D97706;
+  --color-info: #0EA5E9;
+  --color-info-dark: #0284C7;
 
   --color-current: currentColor;
   --color-transparent: transparent;

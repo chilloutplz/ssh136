@@ -1,6 +1,6 @@
 import BoxCubeIcon from "./BoxCubeIcon.vue";
 import GridIcon from "./GridIcon.vue";
-import CalenderIcon from "./CalenderIcon.vue";
+import CalendarIcon from "./CalendarIcon.vue";
 import TaskIcon from "./TaskIcon.vue";
 import ChatIcon from "./ChatIcon.vue";
 import MailIcon from "./MailIcon.vue";
@@ -67,7 +67,7 @@ export {
   ChevronRightIcon,
   GridIcon,
   BoxCubeIcon,
-  CalenderIcon,
+  CalendarIcon,
   UserCircleIcon,
   TaskIcon,
   ChatIcon,

@@ -1,123 +1,165 @@
-<!-- /src/views/Purchases/PurchaseForm.vue -->
 <template>
   <AdminLayout>
-    <PageBreadcrumb :pageTitle="currentPageTitle" />
+    <PageBreadcrumb :pageTitle="mode === 'create' ? 'Create Purchase' : `Edit Purchase #${route.params.id}`" />
 
-    <form @submit.prevent="handleSubmit">
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="space-y-6 sm:col-span-2 lg:col-span-2">
-
-          <!-- 거래처 선택 -->
-          <ComponentCard title="거래처">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <AutoCompleteSupplier v-model="selectedSupplier" />
-
-              <FormInput label="사업자번호" v-model="form.bussinessNumber" placeholder="사업자번호" readonly />
-            </div>
-          </ComponentCard>
-
-          <!-- 수량/금액 -->
-          <ComponentCard title="수량 및 금액">
-            <div class="grid grid-cols-2 gap-4">
-              <FormInput label="수량" v-model.number="form.qty" type="number" placeholder="0" />
-              <FormInput label="금액 (단가)" v-model.number="form.amount" type="number" placeholder="0" />
-            </div>
-          </ComponentCard>
-
-          <!-- 추가 정보 -->
-          <ComponentCard title="추가 정보">
-            <TextArea label="비고 (메모)" v-model="form.memo" placeholder="특이사항을 입력하세요" />
-            <div class="pt-4">
-              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                첨부 파일
-              </label>
-              <input type="file" @change="handleFileChange" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent
-                       px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs
-                       file:mr-5 file:border-0 file:bg-gray-50 file:py-2 file:text-gray-700 hover:file:bg-gray-100" />
-            </div>
-          </ComponentCard>
+    <div class="p-6 md:p-8">
+      <form @submit.prevent="save">
+        <!-- Supplier -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium">Supplier *</label>
+          <select v-model="supplierId" class="input-style" required>
+            <option v-for="party in parties" :key="party.id" :value="party.id">
+              {{ party.name }}
+            </option>
+          </select>
         </div>
 
-        <!-- 작업 버튼 -->
-        <div class="space-y-6 lg:col-span-1">
-          <ComponentCard title="작업">
-            <div class="flex flex-col gap-4 pt-4">
-              <Button type="submit" variant="primary">거래명세서 등록</Button>
-              <Button type="button" variant="outline" @click="resetForm">초기화</Button>
-            </div>
-          </ComponentCard>
+        <!-- Purchased At -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium">Purchased At *</label>
+          <input v-model="purchasedAt" type="datetime-local" class="input-style" required />
         </div>
-      </div>
-    </form>
+
+        <!-- Note -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium">Note</label>
+          <textarea v-model="note" class="input-style"></textarea>
+        </div>
+
+        <!-- Items -->
+        <h3 class="mt-6 text-lg font-semibold">Items</h3>
+        <table class="w-full border-collapse border border-gray-300 mt-2">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="border px-4 py-2">Product</th>
+              <th class="border px-4 py-2">Quantity</th>
+              <th class="border px-4 py-2">Unit Price</th>
+              <th class="border px-4 py-2">Subtotal</th>
+              <th class="border px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in items" :key="index">
+              <td class="border px-4 py-2">
+                <select v-model="item.productId" class="input-style" required>
+                  <option v-for="product in products" :key="product.id" :value="product.id">
+                    {{ product.name }}
+                  </option>
+                </select>
+              </td>
+              <td class="border px-4 py-2">
+                <input v-model.number="item.quantity" type="number" step="0.01" class="input-style" required />
+              </td>
+              <td class="border px-4 py-2">
+                <input v-model.number="item.unitPrice" type="number" step="0.01" class="input-style" required />
+              </td>
+              <td class="border px-4 py-2">
+                {{ (item.quantity * item.unitPrice).toLocaleString() }}
+              </td>
+              <td class="border px-4 py-2">
+                <button type="button" @click="removeItem(index)" class="text-red-600">Remove</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" @click="addItem" class="mt-2 px-4 py-2 bg-gray-200 rounded">Add Item</button>
+
+        <!-- Total -->
+        <div class="mt-6 font-bold">
+          Total: {{ totalPrice.toLocaleString() }}
+        </div>
+
+        <!-- Save -->
+        <div class="mt-6">
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">
+            {{ mode === 'create' ? 'Save' : 'Update' }}
+          </button>
+          <button type="button" @click="cancel" class="ml-2 px-4 py-2 bg-gray-300 rounded">Cancel</button>
+        </div>
+      </form>
+    </div>
   </AdminLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
-import AdminLayout from '@/components/layout/AdminLayout.vue'
-import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
-import ComponentCard from '@/components/common/ComponentCard.vue'
-import Button from '@/components/ui/Button.vue'
-import FormInput from '@/components/forms/FormInput.vue'
-import TextArea from '@/components/forms/TextArea.vue'
-import AutoCompleteSupplier from '@/components/forms/AutoCompleteSupplier.vue'
+import { ref, computed, onMounted } from "vue"
+import { useRoute, useRouter } from "vue-router"
+import AdminLayout from "@/layouts/AdminLayout.vue"
+import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue"
+import { fetchPurchases, createPurchase, updatePurchase } from "@/services/purchase/purchaseService"
+import { fetchParties } from "@/services/party/partyService"
+import { fetchProducts } from "@/services/product/productService"
+import type { Purchase, PurchasePayload } from "@/types/purchase"
+import type { Party } from "@/types/parties"
+import type { Product } from "@/types/products"
 
-const currentPageTitle = ref('거래명세서 등록')
+const route = useRoute()
+const router = useRouter()
 
-interface Supplier {
-  id: number
-  name: string
-  business_number: string
+const mode = route.name === "PurchaseCreate" ? "create" : "edit"
+
+const supplierId = ref<number>()
+const purchasedAt = ref("")
+const note = ref("")
+const items = ref<{ productId?: number; quantity: number; unitPrice: number }[]>([])
+
+const parties = ref<Party[]>([])
+const products = ref<Product[]>([])
+
+const totalPrice = computed(() =>
+  items.value.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+)
+
+function addItem() {
+  items.value.push({ productId: undefined, quantity: 1, unitPrice: 0 })
 }
 
-const form = ref({
-  supplier: '',
-  bussinessNumber: '',
-  qty: 0,
-  amount: 0,
-  memo: '',
-  attachment: null as File | null,
-})
-
-const selectedSupplier = ref<Supplier | null>(null)
-
-watch(selectedSupplier, (supplier) => {
-  form.value.supplier = supplier?.name || ''
-  form.value.bussinessNumber = supplier?.business_number || ''
-})
-
-
-const supplierInput = ref<HTMLElement | null>(null)
-
-onMounted(() => {
-  supplierInput.value?.focus()
-})
-
-
-const handleFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  form.value.attachment = target?.files?.[0] || null
+function removeItem(index: number) {
+  items.value.splice(index, 1)
 }
 
-const resetForm = () => {
-  form.value = {
-    supplier: '',
-    bussinessNumber: '',
-    qty: 0,
-    amount: 0,
-    memo: '',
-    attachment: null,
+async function save() {
+  const payload: PurchasePayload = {
+    supplier: supplierId.value!, // number
+    purchased_at: purchasedAt.value,
+    note: note.value,
+    items: items.value.map(i => ({
+      product: i.productId!, // number
+      quantity: i.quantity,
+      unit_price: i.unitPrice,
+    })),
   }
-  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
-  if (fileInput) fileInput.value = ''
+
+  if (mode === "edit") {
+    const id = Number(route.params.id)
+    await updatePurchase(id, payload)
+    router.push(`/purchases/${id}`)
+  } else {
+    const purchase = await createPurchase(payload)
+    router.push(`/purchases/${purchase.id}`)
+  }
 }
 
-const handleSubmit = async () => {
-  if (!form.value.supplier || form.value.qty <= 0 || form.value.amount <= 0) {
-    alert('필수 정보를 입력해주세요.')
-    return
-  }
-  console.log('등록 데이터:', form.value)
-  alert('거래명세서가 성공적으로 등록되었습니다!')
+function cancel() {
+  router.push("/purchases")
 }
+
+onMounted(async () => {
+  parties.value = await fetchParties()
+  products.value = await fetchProducts().then(res => Array.isArray(res) ? res : res.results)
+
+  if (mode === "edit") {
+    const id = Number(route.params.id)
+    const purchases = await fetchPurchases()
+    const purchase = purchases.find(p => p.id === id) as Purchase
+    supplierId.value = purchase.supplier.id
+    purchasedAt.value = purchase.purchased_at
+    note.value = purchase.note || ""
+    items.value = purchase.items.map(i => ({
+      productId: i.product.id,
+      quantity: i.quantity,
+      unitPrice: i.unit_price,
+    }))
+  }
+})
 </script>

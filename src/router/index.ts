@@ -1,176 +1,62 @@
+// src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+import accountsRoutes from './modules/accounts'
+import dashboardRoutes from './modules/dashboards'
+import adminRoutes from './modules/admin'
+import purchasesRoutes from './modules/purchases'
+import salesRoutes from './modules/sales'
+import inventoryRoutes from './modules/inventory'
+import accountingRoutes from './modules/accounting'
+
+import LandingPage from '@/views/LandingPage.vue'
+import IconGallery from '@/views/Pages/IconGallery.vue'
+import Calendar from '@/views/Others/Calendar.vue'
+import NotFoundPage from '@/views/Errors/FourZeroFour.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  scrollBehavior(to, from, savedPosition) {
-    return savedPosition || { left: 0, top: 0 }
-  },
   routes: [
-    // Menu
-    {
-      path: '/',
-      name: 'Ecommerce',
-      component: () => import('../views/Ecommerce.vue'),
-      meta: {
-        title: 'Dashboard',
-      },
-    },
-    {
-      path: '/calendar',
-      name: 'Calendar',
-      component: () => import('../views/Others/Calendar.vue'),
-      meta: {
-        title: 'Calendar',
-      },
-    },
-    {
-      path: '/purchase',
-      name: 'Purchase',
-      component: () => import('../views/Purchases/Purchase.vue'),
-      meta: {
-        title: 'PurchaseList',
-      },
-    },
-    { path: '/purchases/new',
-      name: 'PurchaseForm',
-      component: () => import('../views/Purchases/PurchaseForm.vue'),
-      meta: {
-        title: 'PurchaseForm',
-      },
-    },
+    { path: '/', name: 'Landing', component: LandingPage, meta: { title: 'Landing' } },
+    { path: '/icon-gallery', name: 'IconGallery', component: IconGallery, meta: { title: 'Icon Gallery' } },
+    { path: '/calendar', name: 'Calendar', component: Calendar, meta: { title: 'Calendar' } },
 
+    //  모듈별 라우트 합치기
+    ...accountsRoutes,
+    ...dashboardRoutes,
+    ...adminRoutes,       // Company, Brand, Branch, Party, Product
+    ...purchasesRoutes,   // Purchase
+    ...salesRoutes,       // Sale
+    ...inventoryRoutes,   // Inventory
+    ...accountingRoutes,  // Accounting
 
-    // Others
-    {
-      path: '/icon-gallery',
-      name: 'IconGallery',
-      component: () => import('../views/Pages/IconGallery.vue'),
-      meta: {
-        title: 'IconGallery',
-      },
-    },
-    /*
-    {
-      path: '/profile',
-      name: 'Profile',
-      component: () => import('../views/Others/UserProfile.vue'),
-      meta: {
-        title: 'Profile',
-      },
-    },
-    {
-      path: '/form-elements',
-      name: 'Form Elements',
-      component: () => import('../views/Forms/FormElements.vue'),
-      meta: {
-        title: 'Form Elements',
-      },
-    },
-    {
-      path: '/basic-tables',
-      name: 'Basic Tables',
-      component: () => import('../views/Tables/BasicTables.vue'),
-      meta: {
-        title: 'Basic Tables',
-      },
-    },
-    {
-      path: '/line-chart',
-      name: 'Line Chart',
-      component: () => import('../views/Chart/LineChart/LineChart.vue'),
-    },
-    {
-      path: '/bar-chart',
-      name: 'Bar Chart',
-      component: () => import('../views/Chart/BarChart/BarChart.vue'),
-    },
-    {
-      path: '/alerts',
-      name: 'Alerts',
-      component: () => import('../views/UiElements/Alerts.vue'),
-      meta: {
-        title: 'Alerts',
-      },
-    },
-    {
-      path: '/avatars',
-      name: 'Avatars',
-      component: () => import('../views/UiElements/Avatars.vue'),
-      meta: {
-        title: 'Avatars',
-      },
-    },
-    {
-      path: '/badge',
-      name: 'Badge',
-      component: () => import('../views/UiElements/Badges.vue'),
-      meta: {
-        title: 'Badge',
-      },
-    },
-    {
-      path: '/buttons',
-      name: 'Buttons',
-      component: () => import('../views/UiElements/Buttons.vue'),
-      meta: {
-        title: 'Buttons',
-      },
-    },
-    {
-      path: '/images',
-      name: 'Images',
-      component: () => import('../views/UiElements/Images.vue'),
-      meta: {
-        title: 'Images',
-      },
-    },
-    {
-      path: '/videos',
-      name: 'Videos',
-      component: () => import('../views/UiElements/Videos.vue'),
-      meta: {
-        title: 'Videos',
-      },
-    },
-    {
-      path: '/blank',
-      name: 'Blank',
-      component: () => import('../views/Pages/BlankPage.vue'),
-      meta: {
-        title: 'Blank',
-      },
-    },
-    {
-      path: '/error-404',
-      name: '404 Error',
-      component: () => import('../views/Errors/FourZeroFour.vue'),
-      meta: {
-        title: '404 Error',
-      },
-    },
-    {
-      path: '/signin',
-      name: 'Signin',
-      component: () => import('../views/Auth/Signin.vue'),
-      meta: {
-        title: 'Signin',
-      },
-    },
-    {
-      path: '/signup',
-      name: 'Signup',
-      component: () => import('../views/Auth/Signup.vue'),
-      meta: {
-        title: 'Signup',
-      },
-    },
-    */
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage, meta: { title: '404 Not Found' } },
   ],
 })
 
-export default router
-
+// 인증 가드
 router.beforeEach((to, from, next) => {
   document.title = `SSH136 | ${to.meta.title}`
+
+  const auth = useAuthStore()
+  const isAuthenticated = !!auth.access
+
+  const publicPages = ['/', '/accounts/login', '/accounts/register', '/accounts/session-expired']
+
+  if (isAuthenticated && (to.path === '/accounts/login' || to.path === '/accounts/register')) {
+    return next('/dashboard')
+  }
+
+  if (publicPages.includes(to.path)) {
+    return next()
+  }
+
+  if (!isAuthenticated) {
+    return next('/accounts/login')
+  }
+
   next()
 })
+
+export default router

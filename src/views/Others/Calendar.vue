@@ -218,8 +218,8 @@
   </AdminLayout>
 </template>
 
-<script setup>
-import AdminLayout from '@/components/layout/AdminLayout.vue'
+<script setup lang="ts">
+import AdminLayout from '@/layouts/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 
 const currentPageTitle = ref('Calendar')
@@ -230,7 +230,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import Modal from '@/components/profile/Modal.vue'
 
-const calendarRef = ref(null)
+// const calendarRef = ref(null)
 const isOpen = ref(false)
 const selectedEvent = ref(null)
 const eventTitle = ref('')

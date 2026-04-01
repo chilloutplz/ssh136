@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6"
+    class="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/3 sm:px-6 sm:pt-6"
   >
     <div class="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
       <div class="w-full">
@@ -38,6 +38,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import VueApexCharts from 'vue3-apexcharts'
+import type { ApexOptions } from 'apexcharts'
 
 const options = [
   { value: 'optionOne', label: 'Monthly' },
@@ -46,7 +48,6 @@ const options = [
 ]
 
 const selected = ref('optionOne')
-import VueApexCharts from 'vue3-apexcharts'
 
 const series = ref([
   {
@@ -59,7 +60,7 @@ const series = ref([
   },
 ])
 
-const chartOptions = ref({
+const chartOptions = ref<ApexOptions>({
   legend: {
     show: false,
     position: 'top',
@@ -74,10 +75,14 @@ const chartOptions = ref({
     },
   },
   fill: {
+    type: 'gradient',
     gradient: {
-      enabled: true,
+      shade: 'light',
+      type: 'vertical',
+      shadeIntensity: 0.5,
       opacityFrom: 0.55,
       opacityTo: 0,
+      stops: [0, 100],
     },
   },
   stroke: {
@@ -86,10 +91,6 @@ const chartOptions = ref({
   },
   markers: {
     size: 0,
-  },
-  labels: {
-    show: false,
-    position: 'top',
   },
   grid: {
     xaxis: {
@@ -132,9 +133,6 @@ const chartOptions = ref({
     },
     axisTicks: {
       show: false,
-    },
-    tooltip: {
-      enabled: false,
     },
   },
   yaxis: {

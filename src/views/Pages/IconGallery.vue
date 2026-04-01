@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { Component } from 'vue'; // 💡 타입 전용 import
 
-import AdminLayout from '@/components/layout/AdminLayout.vue'
+import AdminLayout from '@/layouts/AdminLayout.vue'
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import * as AllIcons from '@/icons/index';
 
@@ -49,7 +49,7 @@ const currentPageTitle = ref("Icon Gallery");
             <component :is="getIconComponent(name)" class="w-full h-full" />
           </div>
 
-          <span class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 break-words max-w-full px-1">
+          <span class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 wrap-break-word max-w-full px-1">
             {{ name }}
           </span>
 

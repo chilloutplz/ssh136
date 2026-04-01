@@ -1,11 +1,9 @@
 <!-- /src/components/common/ComponentCard.vue -->
 <template>
-  <div
-    :class="[
-      'rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]',
-      className,
-    ]"
-  >
+  <div :class="[
+    'rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3',
+    className,
+  ]">
     <!-- Card Header -->
     <div class="px-6 py-5 flex justify-between items-center">
       <div>
@@ -28,6 +26,11 @@
       <div class="space-y-5">
         <slot></slot>
       </div>
+    </div>
+
+    <!-- Card Footer -->
+    <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-100 dark:border-gray-800">
+      <slot name="footer"></slot>
     </div>
   </div>
 </template>
