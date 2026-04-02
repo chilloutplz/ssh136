@@ -2,7 +2,9 @@
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
-    "moduleResolution": "Node"
+    "moduleResolution": "bundler", // 'Node'에서 'bundler'로 변경 (Rollup 에러 해결)
+    "allowSyntheticDefaultImports": true, // Vite 플러그인 임포트 에러 해결
+    "skipLibCheck": true // 노드 환경 라이브러리 체크 건너뛰기
   },
   "include": ["vite.config.ts"]
 }

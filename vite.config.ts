@@ -11,7 +11,8 @@ export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
-    vueDevTools(),
+    // 개발 환경에서만 DevTools 활성화
+    process.env.NODE_ENV === 'development' ? vueDevTools() : [],
   ],
   resolve: {
     alias: {
