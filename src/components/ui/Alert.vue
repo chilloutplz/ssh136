@@ -22,6 +22,12 @@
       </div>
     </div>
   </div>
+  <div :class="['rounded-xl border p-4', containerClass]">
+  <div :class="['-mt-0.5', iconClass]">
+    <component :is="icons[props.variant]" />
+  </div>
+</div>
+
 </template>
 
 <script setup lang="ts">
@@ -36,6 +42,10 @@ interface AlertProps {
   linkHref?: string
   linkText?: string
 }
+
+const containerClass = computed(() => variantClasses[props.variant].container)
+const iconClass = computed(() => variantClasses[props.variant].icon)
+
 
 const props = withDefaults(defineProps<AlertProps>(), {
   showLink: false,

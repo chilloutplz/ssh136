@@ -51,6 +51,14 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Dropzone from 'dropzone'
 import 'dropzone/dist/dropzone.css'
 
+interface DropzoneFile extends File {
+  previewElement: HTMLElement;
+  previewTemplate: HTMLElement;
+  status: string;
+  // 필요한 추가 속성들을 정의
+}
+
+
 const props = defineProps({
   uploadUrl: {
     type: String,
@@ -58,32 +66,37 @@ const props = defineProps({
   },
 })
 
-const dropzoneForm = ref(null)
-const dropzoneId = `dropzone-${Math.random().toString(36).substr(2, 9)}`
-let dropzoneInstance = null
+const dropzoneForm = ref<HTMLFormElement | null>(null)
+const dropzoneId = `dropzone-${Math.random().toString(36).substring(2, 9)}`
+let dropzoneInstance:InstanceType<typeof Dropzone> | null = null;
 
 onMounted(() => {
   Dropzone.autoDiscover = false
 
-  dropzoneInstance = new Dropzone(`#${dropzoneId}`, {
-    url: props.uploadUrl,
-    thumbnailWidth: 150,
-    maxFilesize: 0.5,
-    acceptedFiles: 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml',
-    headers: { 'My-Awesome-Header': 'header value' },
-    dictDefaultMessage: '',
-    init: function () {
-      this.on('addedfile', (file) => {
-        console.log('A file has been added', file)
-      })
-      this.on('success', (file, response) => {
-        console.log('File successfully uploaded', file, response)
-      })
-      this.on('error', (file, error) => {
-        console.error('An error occurred during upload', file, error)
-      })
-    },
-  })
+
+  // ID 대신 ref(dropzoneForm.value)를 직접 사용하는 것이 Vue다운 방식입니다.
+  if (dropzoneForm.value) {
+    dropzoneInstance = new Dropzone(dropzoneForm.value, {
+      url: props.uploadUrl,
+      thumbnailWidth: 150,
+      maxFilesize: 0.5,
+      acceptedFiles: 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml',
+      headers: { 'My-Awesome-Header': 'header value' },
+      dictDefaultMessage: '',
+      init: function () {
+        // DropzoneFile 타입 대신 내부 타입을 사용하거나 any를 사용합니다.
+        this.on('addedfile', (file: DropzoneFile) => {
+          console.log('A file has been added', file)
+        })
+        this.on('success', (file: DropzoneFile, response: unknown) => {
+          console.log('File successfully uploaded', file, response)
+        })
+        this.on('error', (file: DropzoneFile, error: unknown) => {
+          console.error('An error occurred during upload', file, error)
+        })
+      },
+    })
+  }
 })
 
 onBeforeUnmount(() => {

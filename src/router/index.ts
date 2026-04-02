@@ -56,6 +56,8 @@ router.beforeEach((to, from, next) => {
     return next('/accounts/login')
   }
 
+  console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`)
+
   next()
 })
 

@@ -49,6 +49,8 @@
       </div>
     </div>
   </div>
+
+  <div :style="{ height: calcOverlayHeight() }"></div>
 </template>
 
 <script setup lang="ts">
@@ -68,7 +70,7 @@ const endTime = new Date('December 20, 2025 23:59:59 GMT+0530').getTime()
 const now = ref(new Date().getTime())
 const timeLeft = ref(0)
 
-let   counter: number | undefined = undefined
+let counter: ReturnType<typeof setInterval> | undefined = undefined
 
 const countdown = () => {
   counter = setInterval(() => {

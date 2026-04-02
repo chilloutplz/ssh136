@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import { appConfig } from '../../config/app'
+import { appConfig } from '@/config/app'
 </script>
