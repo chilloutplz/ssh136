@@ -1,13 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
-    "outDir": "dist",
-
-    // ✅ 프로젝트 참조 필수 옵션
-    "composite": true
-
-    // ❌ 여기서는 noEmit을 쓰면 안 됩니다
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Node"
   },
-  "include": ["node-scripts"]
+  "include": ["vite.config.ts"]
 }

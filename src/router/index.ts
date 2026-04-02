@@ -12,7 +12,7 @@ import accountingRoutes from './modules/accounting'
 
 import LandingPage from '@/views/LandingPage.vue'
 import IconGallery from '@/views/Pages/IconGallery.vue'
-import Calendar from '@/views/Others/Calendar.vue'
+import Calendar from '@/views/Others/CalendarVue.vue'
 import NotFoundPage from '@/views/Errors/FourZeroFour.vue'
 
 const router = createRouter({
